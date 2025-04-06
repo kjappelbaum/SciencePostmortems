@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PrismaClient } from "@prisma/client";
 import { formatDate } from "@/lib/utils";
 import SubscriptionButton from "@/components/SubscriptionButton";
+import type { Metadata } from "next";
 
 const prisma = new PrismaClient();
 
@@ -13,7 +14,7 @@ export async function generateMetadata({
   params,
 }: {
   params: { slug: string };
-}) {
+}): Promise<Metadata> {
   const category = await getCategory(params.slug);
 
   if (!category) {
