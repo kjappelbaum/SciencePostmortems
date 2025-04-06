@@ -2,13 +2,18 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCategory, getCategoryReports } from "../../../lib/api";
 
-type Props = {
+// Define the proper Next.js page props type
+interface CategoryPageProps {
   params: {
     slug: string;
   };
-};
+  searchParams: Record<string, string | string[] | undefined>;
+}
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(
+  props: CategoryPageProps,
+): Promise<Metadata> {
+  const { params } = props;
   const category = await getCategory(params.slug);
 
   if (!category) {
@@ -23,7 +28,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage(props: CategoryPageProps) {
+  const { params } = props;
   const category = await getCategory(params.slug);
 
   if (!category) {
