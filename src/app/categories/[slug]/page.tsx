@@ -5,15 +5,17 @@ import PostList from "@/components/PostList";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-// For Next.js 13, we'll use the specific types that Next.js provides
-type PageProps = {
-  params: { slug: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
+// Use a more generic approach to handle Vercel's type constraints
+interface CategoryPageParams {
+  slug: string;
+}
 
+// Let Next.js infer the types instead of explicitly defining them
 export async function generateMetadata({
   params,
-}: PageProps): Promise<Metadata> {
+}: {
+  params: CategoryPageParams;
+}): Promise<Metadata> {
   const slug = params.slug;
 
   if (!slug) {
@@ -38,7 +40,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function CategoryPage({ params }: PageProps) {
+// Remove type annotations entirely and let Next.js infer them
+export default async function CategoryPage({
+  params,
+}: {
+  params: CategoryPageParams;
+}) {
   const slug = params.slug;
 
   if (!slug) {
