@@ -74,6 +74,12 @@ export default async function ReportDetailPage({ params }: any) {
     notFound();
   }
 
+  // Transform comments to have string dates instead of Date objects
+  const formattedComments = report.comments.map((comment) => ({
+    ...comment,
+    createdAt: comment.createdAt.toISOString(), // Convert Date to string
+  }));
+
   const isAuthor = user?.id === report.author.id;
 
   return (
@@ -174,7 +180,7 @@ export default async function ReportDetailPage({ params }: any) {
 
         {/* Comments section */}
         <div className="px-6 py-8 border-t border-gray-200">
-          <CommentSection reportId={report.id} comments={report.comments} />
+          <CommentSection reportId={report.id} comments={formattedComments} />
         </div>
       </div>
     </div>

@@ -48,8 +48,12 @@ export default async function CategoryPage(props: any) {
 
   // Transform reports to match the Post type expected by PostList
   const posts = reports.map((report) => ({
-    ...report,
+    id: report.id,
+    title: report.title,
+    slug: report.slug,
     excerpt: report.excerpt || undefined, // Convert null to undefined
+    date: report.date ? report.date.toISOString() : undefined, // Convert Date to string
+    // Add any other properties needed by PostList
   }));
 
   return (
