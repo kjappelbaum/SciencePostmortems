@@ -5,10 +5,7 @@ import { requireAuth } from "@/lib/auth";
 const prisma = new PrismaClient();
 
 // PATCH - Update a comment
-export async function PATCH(
-  request: NextRequest,
-  context: { params: { id: string } },
-) {
+export async function PATCH(request: NextRequest, context: any) {
   const authResult = await requireAuth(request);
 
   if (authResult instanceof NextResponse) {
@@ -71,10 +68,7 @@ export async function PATCH(
 }
 
 // DELETE - Delete a comment
-export async function DELETE(
-  request: NextRequest,
-  context: { params: { id: string } },
-) {
+export async function DELETE(request: NextRequest, context: any) {
   const authResult = await requireAuth(request);
 
   if (authResult instanceof NextResponse) {
