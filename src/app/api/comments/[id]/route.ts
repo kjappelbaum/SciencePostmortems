@@ -4,8 +4,15 @@ import { requireAuth } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
+// Define the type for the params
+type RouteParams = {
+  params: {
+    id: string;
+  };
+};
+
 // PATCH - Update a comment
-export async function PATCH(request: NextRequest, { params }) {
+export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const authResult = await requireAuth(request);
 
   if (authResult instanceof NextResponse) {
@@ -68,7 +75,7 @@ export async function PATCH(request: NextRequest, { params }) {
 }
 
 // DELETE - Delete a comment
-export async function DELETE(request: NextRequest, { params }) {
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
   const authResult = await requireAuth(request);
 
   if (authResult instanceof NextResponse) {
