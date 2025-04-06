@@ -10,12 +10,14 @@ const prisma = new PrismaClient();
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
+interface ReportPageParams {
+  params: {
+    slug: string;
+  };
+}
+
 // Generate metadata for the page
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export async function generateMetadata({ params }: ReportPageParams) {
   const report = await getReport(params.slug);
 
   if (!report) {
@@ -69,12 +71,8 @@ async function getReport(slug: string) {
   }
 }
 
-// Remove the type and let TypeScript infer it
-export default async function ReportDetailPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+// Explicitly type the component parameters
+export default async function ReportDetailPage({ params }: ReportPageParams) {
   const user = await getCurrentUser();
   const report = await getReport(params.slug);
 
