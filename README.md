@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SciencePostmortems Setup and Run Commands
 
-## Getting Started
+## 1. Database Setup
 
-First, run the development server:
+First, ensure PostgreSQL is running and create the database:
+
+```bash
+# If you're using psql directly
+psql postgres
+
+# Inside the PostgreSQL console
+CREATE DATABASE science_postmortems;
+CREATE USER your_username WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE science_postmortems TO your_username;
+\c science_postmortems
+GRANT ALL ON SCHEMA public TO your_username;
+ALTER USER your_username WITH CREATEDB;
+\q
+```
+
+## 2. Environment Configuration
+
+Update the `.env` file with your database credentials:
+
+```
+DATABASE_URL="postgresql://your_username:your_password@localhost:5432/science_postmortems"
+JWT_SECRET="your-secret-key-change-this-in-production"
+NEXT_PUBLIC_BASE_URL="http://localhost:3000"
+```
+
+## 3. Run Database Migrations
+
+Run Prisma migrations to create the database schema:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+## 4. Seed Initial Data
+
+```bash
+npm install -D ts-node
+npx prisma db seed
+```
+
+## 5. Run the Development Server
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Your application should now be running at [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 6. Deployment to Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Push your code to GitHub
+2. Connect your repo to Vercel
+3. Configure the following environment variables in Vercel:
+   - `DATABASE_URL`
+   - `JWT_SECRET`
+   - `NEXT_PUBLIC_BASE_URL`
+4. Deploy your application
 
-## Learn More
+## 7. Next Steps After Deployment
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Create an admin account
+- Add more categories as needed
+- Customize the styling to fit your branding
+- Add more features like voting and reputation systems

@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String       @id @default(uuid())
+  email          String       @unique
+  passwordHash   String
+  jobTitle       String?
+  fieldOfStudy   String?
+  reputation     Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  reports        Report[]
+  comments       Comment[]
+  subscriptions  Subscription[]
+}
+
+model Report {
+  id          String       @id @default(uuid())
+  title       String
+  slug        String       @unique
+  description String       @db.Text
+  reason      String       @db.Text
+  learning    String       @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  author      User         @relation(fields: [authorId], references: [id])
+  authorId    String
+  category    Category     @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  comments    Comment[]
+  subscriptions Subscription[]
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  reports     Report[]
+  subscriptions Subscription[]
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  content   String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  report    Report    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reportId  String
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  parentId  String?
+}
+
+model Subscription {
+  id         String    @id @default(uuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  reportId   String?
+  categoryId String?
+  createdAt  DateTime  @default(now())
+  report     Report?   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reportId])
+  @@unique([userId, categoryId])
+}

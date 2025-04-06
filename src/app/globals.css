@@ -1,26 +1,178 @@
+@import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+Pro:wght@400;600;700&display=swap");
 @import "tailwindcss";
 
+/* Theme variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --primary-color: #a43830; /* Lamalab burgundy */
+    --primary-dark: #8a2e27; /* Darker shade for hover */
+    --text-color: #333333; /* Dark gray for better readability */
+    --secondary-color: #666666; /* Medium gray for secondary text */
+    --background-color: #ffffff; /* Clean white background */
+    --border-color: #e0e0e0; /* Light gray for borders */
+    --light-bg: #fafafa; /* Light background for panels */
+    /* Keep the background/foreground vars for other elements */
+    --background: #ffffff;
+    --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* Dark mode (if needed) */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
 }
 
+/* Base typography */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    background: var(--background-color);
+    color: var(--text-color);
+    font-family: "Source Sans Pro", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--primary-color);
+    letter-spacing: -0.02em;
+    font-family: "Source Sans Pro", sans-serif;
+}
+
+/* Link styles */
+a {
+    color: var(--primary-color);
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+/* Super specific selectors for navigation links */
+/* Navbar links specific */
+header nav a[href="/"],
+header nav a[href="/reports"],
+header nav a[href="/reports/new"],
+header nav a[href="/about"] {
+    background-color: transparent !important;
+    color: var(--secondary-color) !important; /* For non-active links */
+    border-bottom-color: transparent !important;
+}
+
+header nav a[href="/reports/new"] {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+/* Footer links specific */
+footer nav a[href="/"],
+footer nav a[href="/reports"],
+footer nav a[href="/reports/new"],
+footer nav a[href="/about"] {
+    background-color: transparent !important;
+    color: var(--secondary-color) !important;
+}
+
+/* Active navbar link */
+header nav a.border-\[\#A43830\] {
+    color: var(--text-color) !important;
+}
+
+/* BUTTON STYLES */
+/* Target all primary buttons */
+.btn-primary,
+button[type="submit"],
+main a[href="/reports/new"],
+.inline-flex.items-center.justify-center.bg-indigo-600,
+main .bg-indigo-600,
+main .bg-blue-600,
+main .bg-purple-600,
+button.bg-indigo-600,
+main a.bg-indigo-600 {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+/* Target hover states */
+.btn-primary:hover,
+button[type="submit"]:hover,
+main a[href="/reports/new"]:hover,
+.inline-flex.items-center.justify-center.bg-indigo-600:hover,
+main .bg-indigo-600:hover,
+main .bg-blue-600:hover,
+main .bg-purple-600:hover,
+button.bg-indigo-600:hover,
+main a.bg-indigo-600:hover {
+    background-color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+}
+
+/* Main home page button - super specific */
+main .container a[href="/reports/new"],
+main
+    .flex.items-center.justify-center.px-8.py-3.border.border-transparent.text-base.font-medium.rounded-md.text-white.bg-indigo-600 {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+/* Navbar adjustments */
+nav .border-indigo-500 {
+    border-color: var(--primary-color) !important;
+}
+
+nav .text-indigo-600 {
+    color: var(--primary-color) !important;
+}
+
+nav .hover\:text-indigo-500:hover {
+    color: var(--primary-dark) !important;
+}
+
+/* Form elements */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(164, 56, 48, 0.1) !important;
+}
+
+/* Editor toolbar buttons */
+.tiptap-toolbar button.is-active {
+    color: var(--primary-color) !important;
+    background-color: #f8f0f0 !important;
+}
+
+/* Category and tag badges */
+.bg-indigo-100,
+.text-indigo-800 {
+    background-color: #f8f0f0 !important;
+    color: var(--primary-color) !important;
+}
+
+/* Subscribe buttons */
+button.inline-flex.items-center.bg-indigo-600,
+[type="button"].bg-indigo-600,
+button.bg-indigo-600,
+.flex.justify-center.bg-indigo-600 {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+/* Only style primary action buttons in the main content */
+main .container .flex.justify-center a {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+/* Style all themed buttons (for consistency) */
+button.bg-indigo-600,
+button.bg-blue-600,
+button.bg-purple-600 {
+    background-color: var(--primary-color) !important;
+    color: white !important;
 }
