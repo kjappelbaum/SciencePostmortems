@@ -1,85 +1,45 @@
+import React from "react";
+import { getCategory } from "@/lib/api";
+import CategoryHeader from "@/components/CategoryHeader";
+import PostList from "@/components/PostList";
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { getCategory, getCategoryReports } from "../../../lib/api";
 
-// Define the proper Next.js page props type
-interface CategoryPageProps {
-  params: {
-    slug: string;
-  };
-  searchParams: Record<string, string | string[] | undefined>;
-}
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }> | { slug: string };
+}): Promise<Metadata> {
+  // Await the params if it's a promise
+  const params = "then" in props.params ? await props.params : props.params;
+  const slug = params.slug;
 
-export async function generateMetadata(
-  props: CategoryPageProps,
-): Promise<Metadata> {
-  const { params } = props;
-  const category = await getCategory(params.slug);
-
-  if (!category) {
-    return {
-      title: "Category Not Found",
-    };
-  }
+  const category = await getCategory(slug);
 
   return {
-    title: `${category.name} Reports | Science Postmortems`,
-    description: `Browse all postmortem reports related to ${category.name} in scientific research.`,
+    title: `${category.name} | Science Postmortems`,
+    description: category.description,
   };
 }
 
-export default async function CategoryPage(props: CategoryPageProps) {
-  const { params } = props;
-  const category = await getCategory(params.slug);
+export default async function CategoryPage(props: {
+  params: Promise<{ slug: string }> | { slug: string };
+}) {
+  // Await the params if it's a promise
+  const params = "then" in props.params ? await props.params : props.params;
+  const slug = params.slug;
 
-  if (!category) {
-    notFound();
-  }
-
-  const reports = await getCategoryReports(params.slug);
+  const category = await getCategory(slug);
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">{category.name} Reports</h1>
+      <CategoryHeader
+        name={category.name}
+        description={category.description}
+        imageUrl={category.imageUrl}
+      />
 
-      {category.description && (
-        <div className="mb-8 text-gray-700">
-          <p>{category.description}</p>
-        </div>
-      )}
-
-      {reports.length === 0 ? (
-        <div className="text-center py-10">
-          <p className="text-gray-600">No reports found in this category.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reports.map((report) => (
-            <div
-              key={report.id}
-              className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="p-4">
-                <h2 className="text-xl font-semibold mb-2">{report.title}</h2>
-                <p className="text-gray-600 text-sm mb-3">
-                  {new Date(report.createdAt).toLocaleDateString()}
-                </p>
-                {report.excerpt && (
-                  <p className="text-gray-700 mb-4 line-clamp-3">
-                    {report.excerpt}
-                  </p>
-                )}
-                <a
-                  href={`/reports/${report.slug}`}
-                  className="text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  Read full report →
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold mb-6">Posts in {category.name}</h2>
+        <PostList posts={category.posts} />
+      </div>
     </div>
   );
 }

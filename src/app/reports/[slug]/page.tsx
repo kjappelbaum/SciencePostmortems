@@ -11,12 +11,12 @@ const prisma = new PrismaClient();
 export const revalidate = 60; // Revalidate every 60 seconds
 
 // Generate metadata for the page
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const report = await getReport(params.slug);
+export async function generateMetadata(props: any) {
+  // Await the params object
+  const resolvedProps = await props;
+  const slug = resolvedProps.params.slug;
+
+  const report = await getReport(slug);
 
   if (!report) {
     return {
@@ -69,13 +69,13 @@ async function getReport(slug: string) {
   }
 }
 
-export default async function ReportDetailPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function ReportDetailPage(props: any) {
+  // Await the params object
+  const resolvedProps = await props;
+  const slug = resolvedProps.params.slug;
+
   const user = await getCurrentUser();
-  const report = await getReport(params.slug);
+  const report = await getReport(slug);
 
   if (!report) {
     notFound();
