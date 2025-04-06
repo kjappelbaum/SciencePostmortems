@@ -44,7 +44,13 @@ export default async function CategoryPage(props: any) {
     notFound();
   }
 
-  const posts = await getCategoryReports(slug);
+  const reports = await getCategoryReports(slug);
+
+  // Transform reports to match the Post type expected by PostList
+  const posts = reports.map((report) => ({
+    ...report,
+    excerpt: report.excerpt || undefined, // Convert null to undefined
+  }));
 
   return (
     <div className="container mx-auto px-4 py-8">
