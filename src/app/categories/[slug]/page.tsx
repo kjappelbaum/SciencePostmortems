@@ -5,15 +5,12 @@ import PostList from "@/components/PostList";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-// Updated Props type to match PageProps constraint
 type Props = {
-  params: Promise<{ slug: string }> | { slug: string };
+  params: { slug: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export async function generateMetadata(props: Props): Promise<Metadata> {
-  // Explicitly await the params
-  const params = await Promise.resolve(props.params);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = params.slug;
 
   if (!slug) {
@@ -38,9 +35,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   };
 }
 
-export default async function CategoryPage(props: Props) {
-  // Explicitly await the params
-  const params = await Promise.resolve(props.params);
+export default async function CategoryPage({ params }: Props) {
   const slug = params.slug;
 
   if (!slug) {
