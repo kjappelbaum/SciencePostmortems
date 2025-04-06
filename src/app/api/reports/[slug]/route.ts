@@ -1,82 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { requireAuth } from "@/lib/auth";
+import { generateSlug } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 
-interface RouteParams {
-  params: {
-    slug: string;
-  };
-}
-
-// GET - Get a single report by slug
-export async function GET(
-  request: NextRequest,
-  { params }: RouteParams,
-): Promise<NextResponse> {
+// GET - List reports with optional filtering
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    const { slug } = params;
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get("category");
+    const sort = searchParams.get("sort") || "newest";
 
-    // Get the report with related data
-    const report = await prisma.report.findUnique({
-      where: { slug },
+    // Build filter conditions
+    const where: Record<string, unknown> = {};
+
+    if (category) {
+      where.categoryId = category;
+    }
+
+    // Determine sorting
+    let orderBy: Record<string, string> = { createdAt: "desc" };
+
+    if (sort === "votes") {
+      orderBy = { votes: "desc" };
+    } else if (sort === "views") {
+      orderBy = { viewCount: "desc" };
+    }
+
+    const reports = await prisma.report.findMany({
+      where,
+      orderBy,
       include: {
         author: {
           select: {
-            id: true,
             jobTitle: true,
-            fieldOfStudy: true,
             reputation: true,
-            createdAt: true,
           },
         },
         category: true,
-        comments: {
-          include: {
-            author: {
-              select: {
-                id: true,
-                jobTitle: true,
-                reputation: true,
-              },
-            },
-          },
-          orderBy: {
-            createdAt: "asc",
+        _count: {
+          select: {
+            comments: true,
           },
         },
       },
+      take: 20, // Limit to 20 reports
     });
 
-    if (!report) {
-      return NextResponse.json(
-        { message: "Report not found" },
-        { status: 404 },
-      );
-    }
-
-    // Increment view count
-    await prisma.report.update({
-      where: { id: report.id },
-      data: { viewCount: { increment: 1 } },
-    });
-
-    return NextResponse.json(report);
+    return NextResponse.json(reports);
   } catch (error) {
-    console.error("Error fetching report:", error);
+    console.error("Error fetching reports:", error);
     return NextResponse.json(
-      { message: "Failed to fetch report" },
+      { message: "Failed to fetch reports" },
       { status: 500 },
     );
   }
 }
 
-// PATCH - Update a report
-export async function PATCH(
-  request: NextRequest,
-  { params }: RouteParams,
-): Promise<NextResponse> {
+// POST - Create a new report
+export async function POST(request: NextRequest): Promise<NextResponse> {
   // Ensure user is authenticated
   const authResult = await requireAuth(request);
 
@@ -88,98 +71,40 @@ export async function PATCH(
   const user = authResult;
 
   try {
-    const { slug } = params;
-    const { title, description, reason, learning } = await request.json();
+    const { title, categoryId, description, reason, learning } =
+      await request.json();
 
-    // Find the report
-    const report = await prisma.report.findUnique({
-      where: { slug },
-    });
-
-    if (!report) {
+    // Validate required fields
+    if (!title || !categoryId || !description) {
       return NextResponse.json(
-        { message: "Report not found" },
-        { status: 404 },
+        { message: "Missing required fields" },
+        { status: 400 },
       );
     }
 
-    // Check if the user is the author
-    if (report.authorId !== user.id) {
-      return NextResponse.json(
-        { message: "Not authorized to update this report" },
-        { status: 403 },
-      );
-    }
+    // Generate a unique slug for the report
+    const slug = await generateSlug(title);
 
-    // Update the report
-    const updatedReport = await prisma.report.update({
-      where: { id: report.id },
+    // Create the report
+    const report = await prisma.report.create({
       data: {
-        title: title || undefined,
-        description: description || undefined,
-        reason: reason || undefined,
-        learning: learning || undefined,
+        title,
+        slug,
+        description,
+        reason: reason || "",
+        learning: learning || "",
+        authorId: user.id,
+        categoryId,
+        votes: 0,
+        viewCount: 0,
       },
     });
 
-    return NextResponse.json(updatedReport);
+    return NextResponse.json(report, { status: 201 });
   } catch (error) {
-    console.error("Error updating report:", error);
+    console.error("Error creating report:", error);
     return NextResponse.json(
-      { message: "Failed to update report" },
-      { status: 500 },
-    );
-  }
-}
-
-// DELETE - Delete a report
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteParams,
-): Promise<NextResponse> {
-  // Ensure user is authenticated
-  const authResult = await requireAuth(request);
-
-  if (authResult instanceof NextResponse) {
-    return authResult; // This is the error response
-  }
-
-  // If we reach here, authResult is the user object
-  const user = authResult;
-
-  try {
-    const { slug } = params;
-
-    // Find the report
-    const report = await prisma.report.findUnique({
-      where: { slug },
-    });
-
-    if (!report) {
-      return NextResponse.json(
-        { message: "Report not found" },
-        { status: 404 },
-      );
-    }
-
-    // Check if the user is the author
-    if (report.authorId !== user.id) {
-      return NextResponse.json(
-        { message: "Not authorized to delete this report" },
-        { status: 403 },
-      );
-    }
-
-    // Delete the report
-    await prisma.report.delete({
-      where: { id: report.id },
-    });
-
-    return NextResponse.json({ message: "Report deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting report:", error);
-    return NextResponse.json(
-      { message: "Failed to delete report" },
+      { message: "Failed to create report" },
       { status: 500 },
     );
   }

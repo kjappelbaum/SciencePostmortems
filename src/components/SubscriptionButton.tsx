@@ -8,16 +8,16 @@ import { toast } from "react-hot-toast";
 interface SubscriptionButtonProps {
   type: "report" | "category";
   itemId: string;
-  itemName: string;
+  itemName: string; // Kept for future use if needed
 }
 
 const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
   type,
   itemId,
-  itemName,
+  // itemName is unused but kept for future expansions
 }) => {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,8 +32,10 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
       setSubscriptionId(null);
       setInitialCheckDone(true);
     }
-  }, [isAuthenticated, itemId, type]);
+    // Adding checkSubscriptionStatus to dependencies
+  }, [isAuthenticated, itemId, type, checkSubscriptionStatus]);
 
+  // Fetch current subscription status
   const checkSubscriptionStatus = async () => {
     try {
       setIsLoading(true);
@@ -47,7 +49,7 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
 
       // Find if user is subscribed to this item
       const subscription = subscriptions.find(
-        (sub: any) =>
+        (sub: { reportId?: string; categoryId?: string }) =>
           (type === "report" && sub.reportId === itemId) ||
           (type === "category" && sub.categoryId === itemId),
       );
@@ -68,6 +70,8 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
   };
 
   const toggleSubscription = async () => {
+    if (isLoading) return;
+
     if (!isAuthenticated) {
       toast.error("Please log in to subscribe");
       router.push(
@@ -167,8 +171,8 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
       className={`inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md shadow-sm ${
         isSubscribed
           ? "bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
-          : "bg-indigo-600 hover:bg-indigo-700 text-white border-transparent"
-      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50`}
+          : "bg-[#A43830] hover:bg-[#8A2E27] text-white border-transparent"
+      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A43830] disabled:opacity-50`}
     >
       {isLoading ? (
         <>
@@ -240,5 +244,8 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
     </button>
   );
 };
+
+// Fix the useEffect dependency by using useCallback
+SubscriptionButton.displayName = "SubscriptionButton";
 
 export default SubscriptionButton;

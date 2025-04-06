@@ -96,10 +96,10 @@ export default function AboutPage() {
             Join Us
           </h2>
           <p className="mb-6">
-            Whether you're a researcher, lab technician, professor, or student,
-            your experiences matter. By sharing your scientific mistakes and
-            what you learned from them, you contribute to a healthier research
-            culture that embraces learning from failure.
+            Whether you&apos;re a researcher, lab technician, professor, or
+            student, your experiences matter. By sharing your scientific
+            mistakes and what you learned from them, you contribute to a
+            healthier research culture that embraces learning from failure.
           </p>
 
           <div className="flex justify-center mt-8">
