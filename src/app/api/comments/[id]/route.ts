@@ -4,15 +4,11 @@ import { requireAuth } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
-// Define the type for the params
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
-
 // PATCH - Update a comment
-export async function PATCH(request: NextRequest, { params }: RouteParams) {
+export async function PATCH(
+  request: NextRequest,
+  context: { params: { id: string } },
+) {
   const authResult = await requireAuth(request);
 
   if (authResult instanceof NextResponse) {
@@ -20,7 +16,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   }
 
   const user = authResult;
-  const { id } = params;
+  const { id } = context.params;
 
   try {
     const { content } = await request.json();
@@ -75,7 +71,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 }
 
 // DELETE - Delete a comment
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  request: NextRequest,
+  context: { params: { id: string } },
+) {
   const authResult = await requireAuth(request);
 
   if (authResult instanceof NextResponse) {
@@ -83,7 +82,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   }
 
   const user = authResult;
-  const { id } = params;
+  const { id } = context.params;
 
   try {
     const comment = await prisma.comment.findUnique({
