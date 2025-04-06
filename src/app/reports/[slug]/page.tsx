@@ -5,16 +5,17 @@ import { getCurrentUser } from "@/lib/auth";
 import { formatDate } from "@/lib/utils";
 import SubscriptionButton from "@/components/SubscriptionButton";
 import CommentSection from "@/components/CommentSection";
+import { Metadata } from "next";
 
 const prisma = new PrismaClient();
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
 // Generate metadata for the page
-export async function generateMetadata(props: any) {
-  // Await the params object
-  const resolvedProps = await props;
-  const slug = resolvedProps.params.slug;
+export async function generateMetadata(props: any): Promise<Metadata> {
+  // Explicitly await the params object
+  const params = await Promise.resolve(props.params);
+  const slug = params.slug;
 
   const report = await getReport(slug);
 
@@ -70,9 +71,9 @@ async function getReport(slug: string) {
 }
 
 export default async function ReportDetailPage(props: any) {
-  // Await the params object
-  const resolvedProps = await props;
-  const slug = resolvedProps.params.slug;
+  // Explicitly await the params object
+  const params = await Promise.resolve(props.params);
+  const slug = params.slug;
 
   const user = await getCurrentUser();
   const report = await getReport(slug);

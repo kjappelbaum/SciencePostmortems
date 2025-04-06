@@ -6,16 +6,16 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
-  description?: string;
+  description?: string | null;
+  imageUrl?: string | null;
 }
 
 export interface Report {
   id: string;
   title: string;
   slug: string;
-  date: Date;
-  excerpt?: string;
-  content?: string;
+  excerpt?: string | null;
+  date?: Date;
   authorId: string;
   author: {
     jobTitle?: string | null;
