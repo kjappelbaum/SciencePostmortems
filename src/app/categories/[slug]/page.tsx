@@ -5,8 +5,9 @@ import PostList from "@/components/PostList";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+// Updated Props type to match PageProps constraint
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }> | { slug: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
