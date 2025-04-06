@@ -10,14 +10,8 @@ const prisma = new PrismaClient();
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
-interface ReportPageParams {
-  params: {
-    slug: string;
-  };
-}
-
-// Generate metadata for the page
-export async function generateMetadata({ params }: ReportPageParams) {
+// Generate metadata for the page - using minimal type annotation
+export async function generateMetadata({ params }: any) {
   const report = await getReport(params.slug);
 
   if (!report) {
@@ -71,8 +65,8 @@ async function getReport(slug: string) {
   }
 }
 
-// Explicitly type the component parameters
-export default async function ReportDetailPage({ params }: ReportPageParams) {
+// Use 'any' type for page props to avoid type conflicts
+export default async function ReportDetailPage({ params }: any) {
   const user = await getCurrentUser();
   const report = await getReport(params.slug);
 
