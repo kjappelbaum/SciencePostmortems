@@ -34,7 +34,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const token = generateToken(user.id);
 
     // Set authentication cookie
-    setAuthCookie(token);
+    await setAuthCookie(token);
 
     // Return success without exposing sensitive data
     return NextResponse.json({

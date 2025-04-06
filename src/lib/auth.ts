@@ -36,32 +36,32 @@ export function generateToken(userId: string): string {
 export function verifyToken(token: string): { userId: string } | null {
   try {
     return jwt.verify(token, JWT_SECRET) as { userId: string };
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
 // Set auth cookie
-export function setAuthCookie(token: string): void {
-  cookies().set({
-    name: "auth-token",
-    value: token,
+export async function setAuthCookie(token: string): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.set("auth-token", token, {
     httpOnly: true,
-    path: "/",
     secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 24 * 7, // 1 week
-    sameSite: "lax",
+    path: "/",
   });
 }
 
 // Clear auth cookie
-export function clearAuthCookie(): void {
-  cookies().delete("auth-token");
+export async function clearAuthCookie(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete("auth-token");
 }
 
 // Get current user from request
 export async function getCurrentUser(): Promise<UserSession | null> {
-  const token = cookies().get("auth-token")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth-token")?.value;
 
   if (!token) {
     return null;

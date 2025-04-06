@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-hot-toast";
@@ -23,20 +23,8 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
 
-  // Check subscription status when component mounts and auth state changes
-  useEffect(() => {
-    if (isAuthenticated) {
-      checkSubscriptionStatus();
-    } else {
-      setIsSubscribed(false);
-      setSubscriptionId(null);
-      setInitialCheckDone(true);
-    }
-    // Adding checkSubscriptionStatus to dependencies
-  }, [isAuthenticated, itemId, type, checkSubscriptionStatus]);
-
-  // Fetch current subscription status
-  const checkSubscriptionStatus = async () => {
+  // Define checkSubscriptionStatus as a useCallback BEFORE referencing it in useEffect
+  const checkSubscriptionStatus = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch("/api/subscriptions");
@@ -67,7 +55,18 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
       setIsLoading(false);
       setInitialCheckDone(true);
     }
-  };
+  }, [itemId, type]);
+
+  // Check subscription status when component mounts and auth state changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      checkSubscriptionStatus();
+    } else {
+      setIsSubscribed(false);
+      setSubscriptionId(null);
+      setInitialCheckDone(true);
+    }
+  }, [isAuthenticated, checkSubscriptionStatus]);
 
   const toggleSubscription = async () => {
     if (isLoading) return;
@@ -244,8 +243,5 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
     </button>
   );
 };
-
-// Fix the useEffect dependency by using useCallback
-SubscriptionButton.displayName = "SubscriptionButton";
 
 export default SubscriptionButton;
