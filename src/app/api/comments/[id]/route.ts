@@ -4,32 +4,20 @@ import { requireAuth } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-}
-
 // PATCH - Update a comment
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-): Promise<NextResponse> {
-  // Ensure user is authenticated
+export async function PATCH(request: NextRequest, { params }) {
   const authResult = await requireAuth(request);
 
   if (authResult instanceof NextResponse) {
-    return authResult; // This is the error response
+    return authResult;
   }
 
-  // If we reach here, authResult is the user object
   const user = authResult;
+  const { id } = params;
 
   try {
-    const { id } = params;
     const { content } = await request.json();
 
-    // Validate required fields
     if (!content) {
       return NextResponse.json(
         { message: "Comment content is required" },
@@ -37,7 +25,6 @@ export async function PATCH(
       );
     }
 
-    // Find the comment
     const comment = await prisma.comment.findUnique({
       where: { id },
     });
@@ -49,7 +36,6 @@ export async function PATCH(
       );
     }
 
-    // Check if the user is the author
     if (comment.authorId !== user.id) {
       return NextResponse.json(
         { message: "Not authorized to update this comment" },
@@ -57,7 +43,6 @@ export async function PATCH(
       );
     }
 
-    // Update the comment
     const updatedComment = await prisma.comment.update({
       where: { id },
       data: { content },
@@ -83,24 +68,17 @@ export async function PATCH(
 }
 
 // DELETE - Delete a comment
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-): Promise<NextResponse> {
-  // Ensure user is authenticated
+export async function DELETE(request: NextRequest, { params }) {
   const authResult = await requireAuth(request);
 
   if (authResult instanceof NextResponse) {
-    return authResult; // This is the error response
+    return authResult;
   }
 
-  // If we reach here, authResult is the user object
   const user = authResult;
+  const { id } = params;
 
   try {
-    const { id } = params;
-
-    // Find the comment
     const comment = await prisma.comment.findUnique({
       where: { id },
     });
@@ -112,7 +90,6 @@ export async function DELETE(
       );
     }
 
-    // Check if the user is the author
     if (comment.authorId !== user.id) {
       return NextResponse.json(
         { message: "Not authorized to delete this comment" },
@@ -120,7 +97,6 @@ export async function DELETE(
       );
     }
 
-    // Delete the comment
     await prisma.comment.delete({
       where: { id },
     });
