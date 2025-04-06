@@ -1,13 +1,15 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCategory, getCategoryReports } from "@/lib/api";
+import { getCategory, getCategoryReports } from "../../../lib/api";
 
-export async function generateMetadata({
-  params: { slug },
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
-  const category = await getCategory(slug);
+type Props = {
+  params: {
+    slug: string;
+  };
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const category = await getCategory(params.slug);
 
   if (!category) {
     return {
@@ -21,18 +23,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function CategoryPage({
-  params: { slug },
-}: {
-  params: { slug: string };
-}) {
-  const category = await getCategory(slug);
+export default async function CategoryPage({ params }: Props) {
+  const category = await getCategory(params.slug);
 
   if (!category) {
     notFound();
   }
 
-  const reports = await getCategoryReports(slug);
+  const reports = await getCategoryReports(params.slug);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -58,7 +56,7 @@ export default async function CategoryPage({
               <div className="p-4">
                 <h2 className="text-xl font-semibold mb-2">{report.title}</h2>
                 <p className="text-gray-600 text-sm mb-3">
-                  {new Date(report.date).toLocaleDateString()}
+                  {new Date(report.createdAt).toLocaleDateString()}
                 </p>
                 {report.excerpt && (
                   <p className="text-gray-700 mb-4 line-clamp-3">

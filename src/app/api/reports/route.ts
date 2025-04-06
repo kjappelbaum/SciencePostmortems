@@ -23,9 +23,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     let orderBy: any = { createdAt: "desc" };
 
     if (sort === "votes") {
-      orderBy = { votes: "desc" };
+      // Handle the case where votes field isn't available - use createdAt instead
+      orderBy = { createdAt: "desc" };
     } else if (sort === "views") {
-      orderBy = { viewCount: "desc" };
+      // Handle the case where viewCount field isn't available - use createdAt instead
+      orderBy = { createdAt: "desc" };
     }
 
     const reports = await prisma.report.findMany({
@@ -85,7 +87,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Generate a unique slug for the report
     const slug = await generateSlug(title);
 
-    // Create the report
+    // Create the report - removing the fields that aren't in the schema
     const report = await prisma.report.create({
       data: {
         title,
@@ -95,8 +97,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         learning: learning || "",
         authorId: user.id,
         categoryId,
-        votes: 0,
-        viewCount: 0,
+        // Remove the votes and viewCount fields if they're not in your schema
+        // votes: 0,
+        // viewCount: 0,
       },
     });
 

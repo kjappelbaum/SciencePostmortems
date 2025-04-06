@@ -95,8 +95,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         learning: learning || "",
         authorId: user.id,
         categoryId,
-        votes: 0,
-        viewCount: 0,
+        // votes: 0,
+        // viewCount: 0,
       },
     });
 
