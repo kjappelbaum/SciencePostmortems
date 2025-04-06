@@ -13,7 +13,7 @@ interface RouteParams {
 // PATCH - Update a comment
 export async function PATCH(
   request: NextRequest,
-  { params }: RouteParams,
+  { params }: { params: { id: string } },
 ): Promise<NextResponse> {
   // Ensure user is authenticated
   const authResult = await requireAuth(request);
@@ -85,7 +85,7 @@ export async function PATCH(
 // DELETE - Delete a comment
 export async function DELETE(
   request: NextRequest,
-  { params }: RouteParams,
+  { params }: { params: { id: string } },
 ): Promise<NextResponse> {
   // Ensure user is authenticated
   const authResult = await requireAuth(request);
