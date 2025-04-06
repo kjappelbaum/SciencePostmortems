@@ -5,12 +5,15 @@ import PostList from "@/components/PostList";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-type Props = {
+// For Next.js 13, we'll use the specific types that Next.js provides
+type PageProps = {
   params: { slug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const slug = params.slug;
 
   if (!slug) {
@@ -35,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params }: PageProps) {
   const slug = params.slug;
 
   if (!slug) {
